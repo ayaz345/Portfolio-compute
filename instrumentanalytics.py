@@ -51,14 +51,14 @@ def Compute_InstrumentAnalytics(instrument_ids, analytics=None):
     payload = json.dumps(payload) #service expects a string?
 
     #call the url
-    BASEURL = uri + 'api/v1/instruments'
+    BASEURL = f'{uri}api/v1/instruments'
     headers = {
         'accept':'application/json',
         'Content-Type':'application/x-www-form-urlencoded',
         'X-IBM-Access-Token': access_token
         }
     get_data = requests.post(BASEURL, headers=headers, data=payload)
-    print("Instrument Analytics status: " + str(get_data.status_code))
+    print(f"Instrument Analytics status: {get_data.status_code}")
 
     #return json data
     data = get_data.json()

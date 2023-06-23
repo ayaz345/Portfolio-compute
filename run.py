@@ -95,14 +95,14 @@ def portfolio_from_csv():
         try:
             req  = investmentportfolio.Create_Portfolio(my_portfolio)
         except:
-            print("Unable to create portfolio for " + str(key) + ".")
+            print(f"Unable to create portfolio for {str(key)}.")
 
         try:
             for h in range(0,len(value),500):
                 hldgs = value[h:h+500]
                 req  = investmentportfolio.Create_Portfolio_Holdings(str(key),hldgs)
         except:
-            print("Unable to create portfolio holdings for " + str(key) + ".")
+            print(f"Unable to create portfolio holdings for {str(key)}.")
     return req
 
 
@@ -116,10 +116,9 @@ def get_unit_test_portfolios():
     portfolio_names = []
     res = investmentportfolio.Get_Portfolios_by_Selector('type','unit test portfolio')
     try:
-        for portfolios in res['portfolios']:
-            portfolio_names.append(portfolios['name'])
+        portfolio_names.extend(portfolios['name'] for portfolios in res['portfolios'])
         #returns the portfolio names as list
-        print("Portfolio_names:" + str(portfolio_names))
+        print(f"Portfolio_names:{portfolio_names}")
         return json.dumps(portfolio_names)
     except:
         return "No portfolios found."
@@ -150,16 +149,11 @@ def compute_unit_tests():
     Breaks into 500 instrument chunks to comply with container constraints.
     '''
     if request.method == 'POST':
-        portfolios = []
         data = json.loads(request.data)
-        portfolios.append(data["portfolio"])
-
+        portfolios = [data["portfolio"]]
     #Stopwatch
     start_time = datetime.datetime.now()
-    if data:
-        analytics = data["analytics"]
-    else:
-        analytics = ['THEO/Price','THEO/Value']
+    analytics = data["analytics"] if data else ['THEO/Price','THEO/Value']
     results = []
 
     for p in portfolios:
@@ -168,7 +162,7 @@ def compute_unit_tests():
         #Since the payload is too large, odds are there are 500-instrument chunks added to the portfolio.
         for ph in range(0,len(holdings)):
             instruments = [row['instrumentId'] for row in holdings[ph]['holdings']]
-            print("Processing " + str(p) + " portfolio segment #"+str(ph) +".")
+            print(f"Processing {str(p)} portfolio segment #{str(ph)}.")
             #send 500 IDs at a time to Instrument Analytics Service:
             #for i in instruments...
             for i in range(0,len(instruments),500):
@@ -189,13 +183,14 @@ def compute_unit_tests():
                                 r[key] = value
                         results.append(r)
                 #Debug
-                if i+500<len(instruments):
-                    l = i+500
-                else:
-                    l = len(instruments)
-                print("Processed securities " + str(i) + " through " + str(l) + ". Time elapsed on this portfolio: " + str(datetime.datetime.now() - portfolio_start))
+                l = min(i+500, len(instruments))
+                print(
+                    f"Processed securities {str(i)} through {str(l)}. Time elapsed on this portfolio: {str(datetime.datetime.now() - portfolio_start)}"
+                )
 
-    print("Unit testing completed. Total time elapsed: " + str(datetime.datetime.now() - start_time))
+    print(
+        f"Unit testing completed. Total time elapsed: {str(datetime.datetime.now() - start_time)}"
+    )
     return Response(json.dumps(results), mimetype='application/json')
 
 if __name__ == '__main__':

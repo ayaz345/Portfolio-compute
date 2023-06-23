@@ -51,18 +51,16 @@ def Get_Portfolios():
         'content-type': "application/json"
         }
     get_data = requests.get(BASEURL, auth=(IP_R_username, IP_R_password), headers=headers)
-    print("Investment Portfolio status: " + str(get_data.status_code))
-    # return json data
-    data = get_data.json()
-    return data
+    print(f"Investment Portfolio status: {get_data.status_code}")
+    return get_data.json()
 
 def Get_Portfolio_Holdings(Portfolio,latest=True):
     """
     Retreives holdinga data from the Investment Portfolio service for the Portfolio
     """
-    print ("Get Portfolio Holdings for " + Portfolio)
+    print(f"Get Portfolio Holdings for {Portfolio}")
     #construct the url
-    BASEURL = "https://investment-portfolio.mybluemix.net/api/v1/portfolios/" + Portfolio + "/holdings"
+    BASEURL = f"https://investment-portfolio.mybluemix.net/api/v1/portfolios/{Portfolio}/holdings"
     if latest:
         BASEURL += "?latest=true"
     #call the url
@@ -71,10 +69,10 @@ def Get_Portfolio_Holdings(Portfolio,latest=True):
         'content-type': "application/json"
         }
     get_data = requests.get(BASEURL, auth=(IP_R_username, IP_R_password), headers=headers)
-    print("Investment Portfolio - Get Portfolio Holdings status: " + str(get_data.status_code))
-    #return json data
-    data = get_data.json()
-    return data
+    print(
+        f"Investment Portfolio - Get Portfolio Holdings status: {get_data.status_code}"
+    )
+    return get_data.json()
 
 def Get_Portfolios_by_Selector(selector,value):
     """
@@ -94,7 +92,7 @@ def Get_Portfolios_by_Selector(selector,value):
     }
 
     get_data = requests.post(BASEURL, auth=(IP_R_username, IP_R_password), headers=headers, data=json.dumps(s))
-    print("Investment Portfolio status: " + str(get_data.status_code))
+    print(f"Investment Portfolio status: {get_data.status_code}")
     # return json data
     data = get_data.json()
     return data
@@ -105,7 +103,7 @@ def Get_Holdings_by_Selector(portfolio,selector,value):
     """
     print ("Get Portfolios by Selector")
     #call the url
-    BASEURL = "https://investment-portfolio.mybluemix.net/api/v1/portfolios/" + portfolio + "/holdings/_find"
+    BASEURL = f"https://investment-portfolio.mybluemix.net/api/v1/portfolios/{portfolio}/holdings/_find"
     headers = {
         'accept': "application/json",
         'content-type': "application/json"
@@ -116,7 +114,7 @@ def Get_Holdings_by_Selector(portfolio,selector,value):
         }
     }
     get_data = requests.post(BASEURL, auth=(IP_R_username, IP_R_password), headers=headers, data=json.dumps(s))
-    print("Investment Portfolio status: " + str(get_data.status_code))
+    print(f"Investment Portfolio status: {get_data.status_code}")
     # return json data
     data = get_data.json()
     return data
@@ -135,20 +133,19 @@ def Create_Portfolio(Portfolio):
 
     #print the status and returned json
     status = get_data.status_code
-    print("Investment Portfolio status: " + str(status))
+    print(f"Investment Portfolio status: {status}")
 
     if status != 200:
         return get_data
-    else:
-        data = get_data.json()
-        return json.dumps(data, indent=4, sort_keys=True)
+    data = get_data.json()
+    return json.dumps(data, indent=4, sort_keys=True)
 
 def Create_Portfolio_Holdings(portfolio_name,holdings):
     """
     Creates portfolio holdings.
     """
     timestamp = '{:%Y-%m-%dT%H:%M:%S.%fZ}'.format(datetime.datetime.now())
-    BASEURL = "https://investment-portfolio.mybluemix.net/api/v1/portfolios/" + portfolio_name + "/holdings"
+    BASEURL = f"https://investment-portfolio.mybluemix.net/api/v1/portfolios/{portfolio_name}/holdings"
     headers = {
         'Content-Type': "application/json",
         'Accept': "application/json"
@@ -161,19 +158,18 @@ def Create_Portfolio_Holdings(portfolio_name,holdings):
 
     #print the status and returned json
     status = get_data.status_code
-    print("Investment Portfolio Holding status: " + str(status))
+    print(f"Investment Portfolio Holding status: {status}")
 
     if status != 200:
         return get_data.json()
-    else:
-        data = get_data.json()
-        return json.dumps(data, indent=4, sort_keys=True)
+    data = get_data.json()
+    return json.dumps(data, indent=4, sort_keys=True)
 
 def Delete_Portfolio(portfolio_name,timestamp,rev):
     """
     Deletes a portfolio.
     """
-    BASEURL = "https://investment-portfolio.mybluemix.net/api/v1/portfolios/" + str(portfolio_name) + "/" + str(timestamp) + "?rev=" + str(rev)
+    BASEURL = f"https://investment-portfolio.mybluemix.net/api/v1/portfolios/{str(portfolio_name)}/{str(timestamp)}?rev={str(rev)}"
     headers = {
         'Content-Type': "application/json",
         'Accept': "application/json",
@@ -183,18 +179,18 @@ def Delete_Portfolio(portfolio_name,timestamp,rev):
 
     #print the status and returned json
     status = res.status_code
-    print("Investment Portfolio delete status: " + str(status))
+    print(f"Investment Portfolio delete status: {status}")
 
     if status != 200:
         return res
     else:
-        return "Portfolio " + portfolio_name + " deleted successfully."
+        return f"Portfolio {portfolio_name} deleted successfully."
 
 def Delete_Portfolio_Holdings(portfolio_name,timestamp,rev):
     """
     Deletes portfolio holdings.
     """
-    BASEURL = "https://investment-portfolio.mybluemix.net/api/v1/portfolios/" + str(portfolio_name) + "/holdings/" + str(timestamp) + "?rev=" + str(rev)
+    BASEURL = f"https://investment-portfolio.mybluemix.net/api/v1/portfolios/{str(portfolio_name)}/holdings/{str(timestamp)}?rev={str(rev)}"
     print(BASEURL)
     headers = {
         'Content-Type': "application/x-www-form-urlencoded",
@@ -205,9 +201,9 @@ def Delete_Portfolio_Holdings(portfolio_name,timestamp,rev):
 
     #print the status and returned json
     status = res.status_code
-    print("Investment Portfolio holdings delete status: " + str(status))
+    print(f"Investment Portfolio holdings delete status: {status}")
 
     if status != 200:
         return res
     else:
-        return "Portfolio " + portfolio_name + " deleted successfully."
+        return f"Portfolio {portfolio_name} deleted successfully."
